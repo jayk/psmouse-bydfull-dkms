@@ -1,10 +1,10 @@
-#DKMS module for BYD multitouch touchpads 
+# DKMS module for BYD multitouch touchpads 
 
 This repository provides a psmouse module that supports the full
 functionality of the BYD multi-touch touchpad. These touchpads 
 are found in, among other things, Purism's Librem line of laptops.
 
-##What you get...
+## What you get...
 
 This module provides a significantly enhanced touchpad experience.
 Tapping is disabled, and two-finger scrolling both vertically and
@@ -14,7 +14,7 @@ There is significant configurability in the touchpad. In future
 versions, I intend to expose these configuration options via 
 sysfs.
 
-##Build
+## Build
 
 To build or test the functionality of the module, simply cd into
 the psmouse-bydfull directory and run `make`.  This will build 
@@ -35,7 +35,7 @@ If you were successful, your trackpad should be working.  You can test
 that the new module is working by checking that tapping is not registered
 as a click, and two-finger scrolling works.
 
-##DKMS Installation
+## DKMS Installation
 
 To install this module into your auto-update DKMS process, copy
 the psmouse-bydfull directory to /usr/src/psmouse-bydfull-1.0.
