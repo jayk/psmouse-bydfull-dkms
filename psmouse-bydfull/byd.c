@@ -71,8 +71,8 @@ static const unsigned char byd_init_param[] = {
 	// 0xd9, 0x07,  // unknown - unnecessary?
 	0xdc, 0x03,  // left edge width medium
 	0xdd, 0x03,  // top edge height medium
-	0xdf, 0x03,  // right edge height medium
-	0xe1, 0x03,  // bottom edge height medium
+	0xdf, 0x01,  // right edge width slim
+	0xe1, 0x01,  // bottom edge height slim
 	0xd1, 0x00,  // no 'absolute' position interleaving
 	// 0xe7, 0xe8,   // set scaling normal then double. (have to send be in pairs atm.)
 	0xce, 0x00,
