@@ -69,8 +69,8 @@ static const unsigned char byd_init_param[] = {
 	0xe5, 0x00,  // Two finger continue scrolling at edge - off
 	// 0xd9, 0x02,  // unknown - unnecessary?
 	// 0xd9, 0x07,  // unknown - unnecessary?
-	0xdc, 0x03,  // left edge width medium
-	0xdd, 0x03,  // top edge height medium
+	0xdc, 0x01,  // left edge width medium
+	0xdd, 0x01,  // top edge height medium
 	0xdf, 0x01,  // right edge width slim
 	0xe1, 0x01,  // bottom edge height slim
 	0xd1, 0x00,  // no 'absolute' position interleaving
