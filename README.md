@@ -8,7 +8,9 @@ are found in, among other things, Purism's Librem line of laptops.
 
 This module provides a significantly enhanced touchpad experience.
 Tapping is disabled, and two-finger scrolling both vertically and
-horizontally is enabled by default. 
+horizontally is enabled by default. The right-click zone is also
+limited to the bottom-right corner of the pad, rather than the right
+half of the lower quarter of the pad.
 
 There is significant configurability in the touchpad. In future 
 versions, I intend to expose these configuration options via 
