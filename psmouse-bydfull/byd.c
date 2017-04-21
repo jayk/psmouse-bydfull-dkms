@@ -53,7 +53,7 @@ static const unsigned char byd_init_param[] = {
 
 	0xd3, 0x01,  // set right-handedness
 	0xd0, 0x00,  // reset button
-	0xd0, 0x06,  // send click in both corners as separate gestures
+	0xd0, 0x04,  // send click as normal event 
 	0xd4, 0x02,  // disable tapping.
 	0xd5, 0x03,  // tap and drag off
 	0xd7, 0x04,  // edge scrolling off
@@ -69,20 +69,16 @@ static const unsigned char byd_init_param[] = {
 	0xe5, 0x00,  // Two finger continue scrolling at edge - off
 	// 0xd9, 0x02,  // unknown - unnecessary?
 	// 0xd9, 0x07,  // unknown - unnecessary?
-	0xdc, 0x01,  // left edge width medium
-	0xdd, 0x01,  // top edge height medium
+	0xdc, 0x01,  // left edge width slim
+	0xdd, 0x01,  // top edge height slim
 	0xdf, 0x01,  // right edge width slim
 	0xe1, 0x01,  // bottom edge height slim
-	0xd1, 0x00,  // no 'absolute' position interleaving
-	// 0xe7, 0xe8,   // set scaling normal then double. (have to send be in pairs atm.)
+	0xd1, 0x02,  // 'absolute' position interleaving
 	0xce, 0x00,
 	0xcc, 0x00,
 	0xe0, 0x00
 };
 
-#define BYD_CMD_GESTURE		 0
-#define BYD_CMD_SCROLL_INC	 1
-#define BYD_CMD_SCROLL_DEC	-1
 
 struct byd_ext_cmd {
 	char type;
@@ -91,30 +87,34 @@ struct byd_ext_cmd {
 };
 
 static const struct byd_ext_cmd byd_ext_cmd_data[] = {
-	{ BYD_CMD_SCROLL_DEC, 0x28, REL_Z       }, /* pinch out                 */
-	{ BYD_CMD_GESTURE,    0x29, BTN_FORWARD }, /* rotate clockwise          */
-	{ BYD_CMD_SCROLL_INC, 0x2a, REL_HWHEEL  }, /* scroll right (two finger) */
-	{ BYD_CMD_SCROLL_DEC, 0x2b, REL_WHEEL   }, /* scroll down (two finger)  */
-	{ BYD_CMD_GESTURE,    0x2c, BTN_SIDE    }, /* 3-finger-swipe right      */
-	{ BYD_CMD_GESTURE,    0x2d, BTN_TASK    }, /* 3-finger-swipe down       */
-	{ BYD_CMD_GESTURE,    0x33, BTN_MOUSE+10}, /* four finger down          */
-	{ BYD_CMD_SCROLL_INC, 0x35, REL_HWHEEL  }, /* scroll right (region)     */
-	{ BYD_CMD_SCROLL_DEC, 0x36, REL_WHEEL,  }, /* scroll down (region)      */
-	{ BYD_CMD_GESTURE,    0xd3, BTN_MOUSE+8 }, /* 3-finger-swipe up         */
-	{ BYD_CMD_GESTURE,    0xd4, BTN_EXTRA   }, /* 3-finger-swipe left       */
-	{ BYD_CMD_SCROLL_INC, 0xd5, REL_WHEEL   }, /* scroll up (two finger)    */
-	{ BYD_CMD_SCROLL_DEC, 0xd6, REL_HWHEEL  }, /* scroll left (two finger)  */
-	{ BYD_CMD_GESTURE,    0xd7, BTN_BACK    }, /* rotate anti-clockwise     */
-	{ BYD_CMD_SCROLL_INC, 0xd8, REL_RZ      }, /* pinch in                  */
-	{ BYD_CMD_SCROLL_INC, 0xca, REL_WHEEL   }, /* scroll up (region)        */
-	{ BYD_CMD_SCROLL_DEC, 0xcb, REL_HWHEEL  }, /* scroll left (region)      */
-	{ BYD_CMD_GESTURE,    0xcd, BTN_MOUSE+9 }, /* four finger up            */
-	{ BYD_CMD_GESTURE,    0xd2, BTN_RIGHT   }, /* right corner click        */
-	{ BYD_CMD_GESTURE,    0x2e, BTN_LEFT    }, /* left corner click         */
+	{ BYD_CMD_SCROLL_DEC,   0x28, REL_Z	  },	/* pinch out			*/
+	{ BYD_CMD_GESTURE,	0x29, BTN_FORWARD },	/* rotate clockwise		*/
+	{ BYD_CMD_SCROLL_INC,   0x2a, REL_HWHEEL  },	/* scroll right (two finger)	*/
+	{ BYD_CMD_SCROLL_DEC,   0x2b, REL_WHEEL   },	/* scroll down (two finger)	*/
+	{ BYD_CMD_GESTURE,	0x2c, BTN_SIDE	  },	/* 3-finger-swipe right		*/
+	{ BYD_CMD_GESTURE,	0x2d, BTN_TASK	  },	/* 3-finger-swipe down		*/
+	{ BYD_CMD_GESTURE,	0x33, BTN_MOUSE+10},	/* four finger down		*/
+	{ BYD_CMD_SCROLL_INC,   0x35, REL_HWHEEL  },	/* scroll right (region)	*/
+	{ BYD_CMD_SCROLL_DEC,   0x36, REL_WHEEL,  },	/* scroll down (region)		*/
+	{ BYD_CMD_GESTURE,	0xd3, BTN_MOUSE+8 },	/* 3-finger-swipe up		*/
+	{ BYD_CMD_GESTURE,	0xd4, BTN_EXTRA   },	/* 3-finger-swipe left		*/
+	{ BYD_CMD_SCROLL_INC,   0xd5, REL_WHEEL   },	/* scroll up (two finger)	*/
+	{ BYD_CMD_SCROLL_DEC,   0xd6, REL_HWHEEL  },	/* scroll left (two finger)	*/
+	{ BYD_CMD_GESTURE,	0xd7, BTN_BACK	  },	/* rotate anti-clockwise	*/
+	{ BYD_CMD_SCROLL_INC,   0xd8, REL_RZ	  },	/* pinch in			*/
+	{ BYD_CMD_SCROLL_INC,   0xca, REL_WHEEL   },	/* scroll up (region)		*/
+	{ BYD_CMD_SCROLL_DEC,   0xcb, REL_HWHEEL  },	/* scroll left (region)		*/
+	{ BYD_CMD_GESTURE,	0xcd, BTN_MOUSE+9 },	/* four finger up		*/
+	{ BYD_CMD_GESTURE,	0xd2, BTN_RIGHT   },	/* right corner click		*/
+	{ BYD_CMD_GESTURE,	0x2e, BTN_LEFT	  },	/* left corner click		*/
+	{ BYD_CMD_GESTURE,	0x2e, BTN_LEFT	  },	/* left corner click		*/
+	{ BYD_CMD_ABS_POS,	0xf8, BYD_CMD_ABS },	/* absolute position packet	*/
 };
 
 struct byd_data {
 	unsigned char ext_lookup[256];
+	unsigned char x_pos;
+	unsigned char y_pos;
 };
 
 static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
@@ -122,6 +122,7 @@ static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
 	struct byd_data *priv = psmouse->private;
 	struct input_dev *dev = psmouse->dev;
 	unsigned char *packet = psmouse->packet;
+	unsigned char button_flag = BTN_NONE_BIT;
 	int i;
 
 	if (psmouse->pktcnt < psmouse->pktsize)
@@ -132,10 +133,6 @@ static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
 			packet[0], packet[1], packet[2], packet[3]);
 #endif
 
-	input_report_key(dev, BTN_LEFT,    packet[0]       & 1);
-	input_report_key(dev, BTN_MIDDLE, (packet[0] >> 2) & 1);
-	input_report_key(dev, BTN_RIGHT,  (packet[0] >> 1) & 1);
-
 	if (packet[3]) {
 		i = priv->ext_lookup[packet[3]];
 		if (i != 0xff && byd_ext_cmd_data[i].code == packet[3]) {
@@ -144,19 +141,57 @@ static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
 					byd_ext_cmd_data[i].code,
 					byd_ext_cmd_data[i].cmd);
 #endif
-			if (byd_ext_cmd_data[i].type == BYD_CMD_GESTURE) {
+			switch(byd_ext_cmd_data[i].type) {
+			case BYD_CMD_GESTURE:
 				input_report_key(dev, byd_ext_cmd_data[i].cmd, 1);
 				input_report_key(dev, byd_ext_cmd_data[i].cmd, 0);
-			} else {
-				input_report_rel(dev, byd_ext_cmd_data[i].cmd,
-						byd_ext_cmd_data[i].type);
+				break;
+
+			case BYD_CMD_ABS_POS:
+				priv->x_pos = packet[1];
+				priv->y_pos = 255 - packet[2];
+				break;
+
+			default:
+				input_report_rel(dev, byd_ext_cmd_data[i].cmd, byd_ext_cmd_data[i].type);
+				break;
 			}
 		} else {
 			psmouse_warn(psmouse, "unknown code detected %x\n", packet[3]);
 		}
 	} else {
+		/* standard relative position packet */
 		input_report_rel(dev, REL_X, packet[1] ? (int) packet[1] - (int) ((packet[0] << 4) & 0x100) : 0);
 		input_report_rel(dev, REL_Y, packet[2] ? (int) ((packet[0] << 3) & 0x100) - (int) packet[2] : 0);
+
+#ifdef DEBUG
+		psmouse_dbg(psmouse, "absolute position %d %d\n", priv->x_pos, priv->y_pos);
+#endif
+		/* If we got a click... let's look at our position 
+		 * to decide what kind of click to make it
+		 */
+		if (packet[0] & BTN_ANY_BIT) {
+			if (priv->x_pos >= BYD_RIGHT_CLICK_START_X_POS &&
+				priv->y_pos >= BYD_RIGHT_CLICK_START_Y_POS) {
+
+				/* X and Y are within the Right-Click zone
+				 * So no matter what button was reported
+				 * it's now a right-click
+				 */
+				button_flag = BTN_RIGHT_BIT;
+			} else {
+				/* Not in our Right-Click zone
+				 * So it's a left click
+				 */
+				button_flag = BTN_LEFT_BIT;
+			}
+		} else {
+			button_flag = BTN_NONE_BIT;
+		}
+
+		input_report_key(dev, BTN_LEFT,	button_flag	   & 1);
+		input_report_key(dev, BTN_MIDDLE, (button_flag >> 2) & 1);
+		input_report_key(dev, BTN_RIGHT,  (button_flag >> 1) & 1);
 	}
 
 	input_sync(dev);
@@ -222,7 +257,7 @@ int byd_init(struct psmouse *psmouse)
 
 	/* magic identifier the vendor driver reads */
 	if (param[0] != 0x08 || param[1] != 0x01 ||
-	    param[2] != 0x01 || param[3] != 0x31) {
+		param[2] != 0x01 || param[3] != 0x31) {
 		psmouse_err(psmouse, "unknown magic, expected: 08 01 01 31\n");
 		error = -EINVAL;
 		goto init_fail;
@@ -305,10 +340,10 @@ int byd_detect(struct psmouse *psmouse, bool set_properties)
 	/* magic knock - identify the mouse (as per. the datasheet) */
 	param[0] = 0x03;
 	if (ps2_command(ps2dev, param, PSMOUSE_CMD_SETRES) ||
-	    ps2_command(ps2dev, param, PSMOUSE_CMD_SETRES) ||
-	    ps2_command(ps2dev, param, PSMOUSE_CMD_SETRES) ||
-	    ps2_command(ps2dev, param, PSMOUSE_CMD_SETRES) ||
-	    ps2_command(ps2dev, param, PSMOUSE_CMD_GETINFO))
+		ps2_command(ps2dev, param, PSMOUSE_CMD_SETRES) ||
+		ps2_command(ps2dev, param, PSMOUSE_CMD_SETRES) ||
+		ps2_command(ps2dev, param, PSMOUSE_CMD_SETRES) ||
+		ps2_command(ps2dev, param, PSMOUSE_CMD_GETINFO))
 		return -EIO;
 
 	psmouse_dbg(psmouse, "detect: model id: %x %x %x\n",
