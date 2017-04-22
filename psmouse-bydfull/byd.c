@@ -24,7 +24,7 @@
  *
  */
 
-/* #define DEBUG 1 */
+#define DEBUG 0 
 
 #include <linux/input.h>
 #include <linux/serio.h>
@@ -37,8 +37,6 @@
 #define BYD_MODEL_ID_LEN        2
 #define BYD_CMD_PAIR(c)		((1 << 12) | (c))
 #define BYD_CMD_PAIR_R(r,c)	((1 << 12) | (r << 8) | (c))
-
-#define DEBUG 0
 
 struct byd_model_info {
 	char name[16];
@@ -158,6 +156,7 @@ static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
 			}
 		} else {
 			psmouse_warn(psmouse, "unknown code detected %x\n", packet[3]);
+                        return PSMOUSE_BAD_DATA;
 		}
 	} else {
 		/* standard relative position packet */
