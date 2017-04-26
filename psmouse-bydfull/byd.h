@@ -22,6 +22,11 @@ int byd_init(struct psmouse *psmouse);
 #define BYD_CMD_SCROLL_DEC			-1
 #define BYD_CMD_ABS_POS				2
 #define BYD_CMD_ABS				2
+#define BYD_SIDE_SCROLL_OFF                     0
+#define BYD_SIDE_SCROLL_ON                      1
+#define BYD_SIDE_SCROLL_START                   250
+#define BYD_SIDE_SCROLL_END                     255
+
 #define BYD_RIGHT_CLICK_START_Y_POS		235
 #define BYD_RIGHT_CLICK_START_X_POS		225
 

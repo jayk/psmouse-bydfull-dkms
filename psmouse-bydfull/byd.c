@@ -24,7 +24,7 @@
  *
  */
 
-#define DEBUG 0 
+//#define DEBUG 0
 
 #include <linux/input.h>
 #include <linux/serio.h>
@@ -51,7 +51,7 @@ static const unsigned char byd_init_param[] = {
 
 	0xd3, 0x01,  // set right-handedness
 	0xd0, 0x00,  // reset button
-	0xd0, 0x04,  // send click as normal event 
+	0xd0, 0x04,  // send click as normal event
 	0xd4, 0x02,  // disable tapping.
 	0xd5, 0x03,  // tap and drag off
 	0xd7, 0x04,  // edge scrolling off
@@ -109,10 +109,20 @@ static const struct byd_ext_cmd byd_ext_cmd_data[] = {
 	{ BYD_CMD_ABS_POS,	0xf8, BYD_CMD_ABS },	/* absolute position packet	*/
 };
 
+struct byd_settings {
+    bool side_scroll_enabled;
+    unsigned char side_scroll_x_start;
+    unsigned char side_scroll_x_end;
+    unsigned char right_click_x_start;
+    unsigned char right_click_y_start;
+};
+
 struct byd_data {
 	unsigned char ext_lookup[256];
 	unsigned char x_pos;
 	unsigned char y_pos;
+	unsigned int side_scrolling_count;
+        struct byd_settings settings;
 };
 
 static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
@@ -122,6 +132,7 @@ static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
 	unsigned char *packet = psmouse->packet;
 	unsigned char button_flag = BTN_NONE_BIT;
 	int i;
+        signed char rel_x, rel_y;
 
 	if (psmouse->pktcnt < psmouse->pktsize)
 		return PSMOUSE_GOOD_DATA;
@@ -159,19 +170,47 @@ static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
                         return PSMOUSE_BAD_DATA;
 		}
 	} else {
+                rel_x = packet[1] ? (int) packet[1] - (int) ((packet[0] << 4) & 0x100) : 0;
+                rel_y = packet[2] ? (int) ((packet[0] << 3) & 0x100) - (int) packet[2] : 0;
+#ifdef DEBUG
+	psmouse_dbg(psmouse, "rel_movement: %d %d\n", rel_x, rel_y);
+#endif
 		/* standard relative position packet */
-		input_report_rel(dev, REL_X, packet[1] ? (int) packet[1] - (int) ((packet[0] << 4) & 0x100) : 0);
-		input_report_rel(dev, REL_Y, packet[2] ? (int) ((packet[0] << 3) & 0x100) - (int) packet[2] : 0);
+                if (priv->settings.side_scroll_enabled == BYD_SIDE_SCROLL_ON &&
+                        priv->x_pos >= priv->settings.side_scroll_x_start &&
+                        priv->x_pos <= priv->settings.side_scroll_x_end ) {
+
+                    priv->side_scrolling_count++;
+
+                } else {
+                    priv->side_scrolling_count = 0;
+                }
+                if (priv->side_scrolling_count > 6) {
+                    //if (priv->side_scrolling_count % 2) {
+                    //    input_report_rel(dev, REL_WHEEL, rel_y);
+                    //}
+                    if (priv->side_scrolling_count & 0x02) {
+                        if (rel_y > 0) {
+                            input_report_rel(dev, REL_WHEEL, 1);
+                        } else if (rel_y < 0) {
+                            input_report_rel(dev, REL_WHEEL, -1);
+                        }
+                    }
+
+                } else {
+                    input_report_rel(dev, REL_X, rel_x);
+                    input_report_rel(dev, REL_Y, rel_y);
+                }
 
 #ifdef DEBUG
 		psmouse_dbg(psmouse, "absolute position %d %d\n", priv->x_pos, priv->y_pos);
 #endif
-		/* If we got a click... let's look at our position 
+		/* If we got a click... let's look at our position
 		 * to decide what kind of click to make it
 		 */
 		if (packet[0] & BTN_ANY_BIT) {
-			if (priv->x_pos >= BYD_RIGHT_CLICK_START_X_POS &&
-				priv->y_pos >= BYD_RIGHT_CLICK_START_Y_POS) {
+			if (priv->x_pos >= priv->settings.right_click_x_start &&
+				priv->y_pos >= priv->settings.right_click_y_start) {
 
 				/* X and Y are within the Right-Click zone
 				 * So no matter what button was reported
@@ -255,7 +294,8 @@ int byd_init(struct psmouse *psmouse)
 #endif
 
 	/* magic identifier the vendor driver reads */
-	if (param[0] != 0x08 || param[1] != 0x01 ||
+        /* first byte may vary - but so far 0x08 is always set. */
+	if ((param[0] & 0x08) == 0 || param[1] != 0x01 ||
 		param[2] != 0x01 || param[3] != 0x31) {
 		psmouse_err(psmouse, "unknown magic, expected: 08 01 01 31\n");
 		error = -EINVAL;
@@ -290,6 +330,14 @@ int byd_init(struct psmouse *psmouse)
 	for (i = 0; i < ARRAY_SIZE(byd_ext_cmd_data); i++) {
 		priv->ext_lookup[byd_ext_cmd_data[i].code] = i & 0xff;
 	}
+        /* set initial values for priv and settings */
+        priv->side_scrolling_count = 0;
+        priv->settings.side_scroll_enabled = BYD_SIDE_SCROLL_ON;
+        priv->settings.side_scroll_x_start = 251;
+        priv->settings.side_scroll_x_end = 255;
+        priv->settings.right_click_x_start = 205;
+        priv->settings.right_click_y_start = 235;
+
 	psmouse->private = priv;
 
 	/* exit command mode */
