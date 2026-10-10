@@ -59,3 +59,10 @@ To load the new module, run the following two commands:
 *Note that this is only necessary the first time.  Subsequent
 boots will load the updated module automatically*
 
+
+## Modern kernel build (opt-in)
+
+For the tested Linux 7.0 base, see [modern/README.md](modern/README.md). This path
+uses matching vendor mouse sources with an opt-in firmware-scroll profile and
+explicit teardown before returning to the stock driver. The legacy bundle and
+its DKMS installation above are unchanged. The modern path does not install DKMS.
